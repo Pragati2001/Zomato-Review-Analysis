@@ -1,99 +1,153 @@
-# Zomato Review Sentiment Analysis: A Comprehensive Guide
-This repository provides an in-depth guide on performing sentiment analysis on Zomato reviews using Natural Language Processing (NLP) and machine learning techniques. The focus is on preprocessing textual data, building models, and evaluating their performance. The notebook takes you through the entire process, from data cleaning to advanced machine learning techniques like transformers.
+# 🧠 Zomato Review Sentiment Analysis using NLP and Gaussian Naive Bayes
 
-Table of Contents
-<ul><li>Introduction</li>
+## 📌 Project Overview
 
-<li>NLP Fundamentals</li>
-<li>
-Data Preprocessing Techniques</li>
-<li>
-Machine Learning Models for Text</li>
-<li>
-Word Embeddings and Word2Vec</li>
-<li>
-Sequence-to-Sequence Models</li>
-<li>
-Transformer Models in NLP</li>
-<li>
-Conclusion</li></ul>
+This project is a machine learning-based sentiment analysis system that predicts customer sentiment or review ratings based on textual data collected from the **Zomato Restaurant Review Dataset**. Using **Natural Language Processing (NLP)** and a **Gaussian Naive Bayes classifier**, we convert raw user reviews into a structured format suitable for machine learning, train a model, and evaluate its performance.
 
-## 1. Introduction
-Sentiment analysis in the context of customer reviews is a key area of Natural Language Processing (NLP). This notebook walks through how we can analyze sentiments in Zomato reviews, where the goal is to classify the review as positive, negative, or neutral. We'll explore various techniques such as text preprocessing, machine learning models, and advanced transformer models.
+---
 
-## 2. NLP Fundamentals
-# What is NLP?
-NLP stands for Natural Language Processing, a field within artificial intelligence that enables computers to understand and interpret human language. It's a critical technology for tasks like sentiment analysis, machine translation, and text summarization. By using NLP, we can process raw text data and extract meaningful information from it.
+## 🎯 Objectives
 
-## Key Challenges in NLP
-#Some common challenges in NLP include:
-<ul><li>
-1.**Ambiguity**: Words can have multiple meanings depending on the context.</li>
-<li>
-2.**Sarcasm**: Detecting sarcasm in text can be difficult, especially in short reviews.
-</li>
-<li>**Handling slang and abbreviations**: Informal language can add complexity to text processing.</li></ul>
+- Clean and preprocess unstructured textual review data
+- Convert text into a numerical format (Bag of Words)
+- Train a machine learning model to classify sentiment or rating
+- Evaluate the model using confusion matrix and accuracy metrics
 
-## 3. Data Preprocessing Techniques
-Before diving into machine learning models, it's important to clean and preprocess the data. Here are the key steps involved:
+---
 
-1. **Text Cleaning**
-This step involves removing unnecessary elements like punctuation, special characters, and irrelevant white spaces.
+## 🧰 Tools & Libraries Used
 
-2. **Tokenization**
-Tokenization is the process of splitting a sentence into individual words or tokens, which allows models to work with words instead of raw text.
+| Tool/Library       | Purpose                             |
+|--------------------|-------------------------------------|
+| **Python**         | Core programming language           |
+| **Pandas**         | Data manipulation                   |
+| **NumPy**          | Numerical computations              |
+| **NLTK**           | Natural language processing         |
+| **Scikit-learn**   | ML algorithms, vectorization, metrics |
+| **Regex** (`re`)   | Text cleaning and pattern matching  |
 
-3. **Stopword Removal**
-Stopwords are common words like “the,” “is,” and “on” that don’t contribute much to the meaning of a sentence and can be removed to improve model performance.
+---
 
-4. **Lemmatization**
-Lemmatization reduces words to their base form. For example, "running" becomes "run," which helps in reducing the size of the vocabulary for the model.
+## 📁 Dataset
 
-## 4. Machine Learning Models for Text
-Once the data is preprocessed, the next step is to represent the text in a form that machine learning models can understand. We explore three common techniques for text representation:
+- File: `Dataset_master - Zomato Review Kaggle.csv`
+- Description: Contains restaurant reviews with corresponding user ratings.
+- Format: CSV
+- Key Column Used: `'Review'` for text, last column as the target variable (e.g., sentiment or rating)
 
-1. Bag of Words (BoW)
-This method represents text as a set of features based on the presence or frequency of words in the document. While simple, it can be highly effective in many text classification tasks.
+---
 
-2. TF-IDF (Term Frequency - Inverse Document Frequency)
-TF-IDF improves upon the BoW model by considering both the frequency of a word in a document and its rarity across the entire corpus. This helps to highlight important words and reduces the impact of common, unimportant words.
+## 🔄 Data Preprocessing Steps
 
-3. Word Embeddings (Word2Vec)
-Word embeddings, like Word2Vec, map words to dense vector representations, capturing their semantic meaning. Word2Vec considers the context in which words appear and learns their relationships through training on large corpora. We’ll see how to use the Gensim library to train and visualize Word2Vec embeddings.
+```python
+# Remove non-alphabet characters using regex
+# Convert text to lowercase
+# Remove stopwords (except "not" to preserve sentiment)
+# Apply stemming to normalize words
+```
 
-## 5. Word Embeddings and Word2Vec
-Word embeddings like Word2Vec are critical for improving machine learning models by converting words into vector representations. These embeddings capture the semantic relationships between words, so words that are similar in meaning will have similar vector representations.
+---
 
-1. Word2Vec Basics
-Word2Vec has two main models:
+## 🧠 Feature Extraction (Bag of Words)
 
-Skip-gram: Predicts context words given a target word.
+We use `CountVectorizer` from scikit-learn to:
 
-Continuous Bag of Words (CBOW): Predicts a target word based on context words.
+- Convert the corpus into a sparse matrix of word counts
+- Limit the vocabulary size to the top 1600 most frequent words
+- Transform reviews into numerical vectors (`X`) for modeling
 
-2. Using Gensim for Word2Vec
-We use the Gensim library to train Word2Vec models, which makes it easy to create, manipulate, and visualize word embeddings. With Gensim, we can analyze word similarities and perform tasks like finding words related to "food" or "service."
+```python
+cv = CountVectorizer(max_features=1600)
+X = cv.fit_transform(corpus).toarray()
+y = zomato_csv.iloc[:, -1].values  # Extract the target label
+```
+---
 
-## 6. Sequence-to-Sequence Models (Seq2Seq)
-Sequence-to-sequence (Seq2Seq) models are essential for NLP tasks where the input and output are both sequences of words. These models have found significant success in tasks like machine translation and text summarization.
+## 🧪 Model Training
+Algorithm: Gaussian Naive Bayes (GNB)
+We chose GNB for the following reasons:
 
-## Encoder-Decoder Architecture
-A Seq2Seq model typically uses two components:
+- Efficient for high-dimensional feature spaces like text
 
-Encoder: Reads the input sequence and encodes it into a fixed-length vector.
+- Works well with Bag of Words features (assumes Gaussian distribution of features)
 
-Decoder: Generates the output sequence from the encoded representation.
+- Simple and interpretable
 
-## 7. Transformer Models in NLP
-Transformer models, particularly BERT (Bidirectional Encoder Representations from Transformers), have revolutionized NLP by providing a more efficient architecture for tasks like sentiment analysis, question answering, and text classification.
+```python
+Copy
+Edit
+from sklearn.naive_bayes import GaussianNB
+classifier = GaussianNB()
+classifier.fit(X_train, y_train)
+```
 
-1. Introduction to Transformers
-Transformers use self-attention mechanisms to process the entire sequence of words simultaneously, rather than word-by-word, enabling better contextual understanding.
+---
 
-2. BERT Model
-BERT is pre-trained on vast amounts of text and can be fine-tuned for specific tasks. Unlike earlier models, which processed text left to right, BERT captures the context of words in both directions, making it more effective for understanding nuanced meanings in text.
+## 📊 Evaluation
+We evaluate the model on unseen test data using:
 
-## 8. Conclusion
-This guide provides a comprehensive overview of sentiment analysis on Zomato reviews using a variety of NLP techniques. We covered everything from text preprocessing and traditional machine learning models like Bag of Words and TF-IDF to advanced methods like Word2Vec, Seq2Seq, and Transformer-based models like BERT.
+- Confusion Matrix – to observe classification performance per class
 
-By following the steps in this notebook, you can successfully analyze sentiment in Zomato reviews or any other text data, and apply cutting-edge NLP methods to improve the accuracy of your sentiment analysis models.
+- Accuracy Score – percentage of correct predictions
+
+```python
+Copy
+Edit
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+y_pred = classifier.predict(X_test)
+cm = confusion_matrix(y_test, y_pred)
+acc = accuracy_score(y_test, y_pred)
+
+✅ Sample Output:
+lua
+Copy
+Edit
+Confusion Matrix:
+[[73 15]
+ [12 100]]
+
+Accuracy: 86.5%
+```
+Results may vary depending on your dataset and random state.
+![image](https://github.com/user-attachments/assets/bd29bbbf-2182-4e52-a916-d860af52711f)
+
+
+---
+
+🚀 How to Run
+- Clone the repository
+
+- Place the dataset CSV in the root folder
+
+- Run the Python file or Jupyter notebook step by step
+
+- Ensure required libraries are installed (pip install nltk pandas scikit-learn)
+
+- pip install -r requirements.txt
+
+- Make sure to download NLTK stopwords:
+
+```python
+Copy
+Edit
+import nltk
+nltk.download('stopwords')
+```
+
+---
+
+## 💬 Conclusion
+This project demonstrates how traditional machine learning techniques like Naive Bayes can be effectively used for text classification. It also highlights the importance of proper NLP preprocessing in determining model performance.
+
+Even simple models, when trained on clean, well-prepared data, can yield powerful and interpretable results in real-world applications.
+
+---
+
+## Example Use Cases
+Predicting user satisfaction from restaurant reviews
+
+Monitoring feedback in food delivery platforms
+
+Sentiment filtering for customer service pipelines
+
